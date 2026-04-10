@@ -21,7 +21,7 @@
         work correctly both with client-side routing and a non-root public URL.
         Learn how to configure a non-root public URL by running `npm run build`.
         -->
-        <title>Emergent | Fullstack App</title>
+        <title>PunchListJobs</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
     </head>
@@ -147,12 +147,21 @@
             })(document, window.posthog || []);
             posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
                 api_host: "https://us.i.posthog.com",
-                person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well,
+                person_profiles: "identified_only",
                 session_recording: {
-                    recordCrossOriginIframes: true,
+                    recordCrossOriginIframes: false,
                     capturePerformance: false,
+                    blockSelector: ".g-recaptcha, iframe[src*='recaptcha'], iframe[title*='recaptcha'], iframe[title*='reCAPTCHA']",
                 },
             });
+            // Suppress PostHog childNodes errors caused by reCAPTCHA iframe disposal
+            window.addEventListener("error", function(e) {
+                if (e.message && e.message.includes("childNodes") && e.filename && e.filename.includes("posthog")) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    return true;
+                }
+            }, true);
         </script>
     </body>
 </html>

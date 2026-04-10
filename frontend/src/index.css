@@ -19,6 +19,9 @@ code {
 
 @layer base {
     :root {
+        --theme-accent: #ccff00;
+        --theme-brand: #0000FF;
+        --theme-nav-bg: #050A30;
         --background: 0 0% 100%;
         --foreground: 0 0% 3.9%;
         --card: 0 0% 100%;
@@ -46,6 +49,9 @@ code {
         --radius: 0.5rem;
     }
     .dark {
+        --theme-accent: #ccff00;
+        --theme-brand: #0000FF;
+        --theme-nav-bg: #050A30;
         --background: 0 0% 3.9%;
         --foreground: 0 0% 98%;
         --card: 0 0% 3.9%;
@@ -80,6 +86,12 @@ code {
     body {
         @apply bg-background text-foreground;
     }
+}
+
+@layer utilities {
+    .text-accent { color: var(--theme-accent); }
+    .bg-brand  { background-color: var(--theme-brand); }
+    .bg-nav    { background-color: var(--theme-nav-bg); }
 }
 
 @layer base {
