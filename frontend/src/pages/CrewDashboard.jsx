@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import TradeSelect from "../components/TradeSelect";
@@ -17,6 +18,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function CrewDashboard() {
   const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
   const { addListener, sendLocation, connected } = useWebSocket();
   const [view, setView] = useState("map");
   const [jobs, setJobs] = useState([]);
@@ -216,6 +218,24 @@ export default function CrewDashboard() {
       toast.success("Withdrawn from job.");
       fetchMyJobs(); fetchJobs();
     } catch (e) { toast.error(e?.response?.data?.detail || "Failed to withdraw"); }
+  };
+
+  const messageContractor = async (jobId) => {
+    try {
+      const { data } = await axios.post(`${API}/messages/threads/job/${jobId}`);
+      navigate(`/messages?thread=${data.id}`);
+    } catch (e) {
+      const detail = e?.response?.data?.detail || "";
+      if (detail.includes("UPGRADE_REQUIRED")) toast.error("Upgrade your plan to message contractors");
+      else toast.error(detail || "Failed to open chat");
+    }
+  };
+
+  const messageAdmin = async () => {
+    try {
+      const { data } = await axios.post(`${API}/messages/threads/admin`);
+      navigate(`/messages?thread=${data.id}`);
+    } catch (e) { toast.error(e?.response?.data?.detail || "Failed to open support chat"); }
   };
 
   // Fetch contractor info when preview modal opens
@@ -507,7 +527,15 @@ export default function CrewDashboard() {
 
             {/* My Active Jobs */}
             <div className="card p-4">
-              <h3 className="font-bold text-[#050A30] dark:text-white text-sm mb-3" style={{ fontFamily: "Manrope, sans-serif" }}>My Active Jobs</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-[#050A30] dark:text-white text-sm" style={{ fontFamily: "Manrope, sans-serif" }}>My Active Jobs</h3>
+                <button
+                  onClick={messageAdmin}
+                  className="text-xs flex items-center gap-1 text-[#0000FF] dark:text-blue-400 hover:underline font-semibold"
+                  data-testid="crew-message-admin-btn">
+                  <MessageCircle className="w-3 h-3" /> Admin Support
+                </button>
+              </div>
               {myJobs.filter(j => ["in_progress", "fulfilled", "open", "suspended"].includes(j.status)).length === 0 ? (
                 <p className="text-slate-400 text-sm">No active jobs. Accept a job to get started!</p>
               ) : (
@@ -625,6 +653,14 @@ export default function CrewDashboard() {
                   className={`w-full py-3 rounded-xl font-bold transition-colors ${isExpired ? "bg-slate-300 text-slate-500 cursor-not-allowed" : selectedJob.is_emergency ? "bg-red-600 text-white hover:bg-red-700" : "bg-[#0000FF] text-white hover:bg-blue-700"}`}
                   data-testid="modal-accept-job">
                   {isExpired ? "Subscription Expired" : selectedJob.is_emergency ? "Accept Emergency Job" : "Accept This Job"}
+                </button>
+              )}
+              {acceptedIds.includes(selectedJob.id) && (
+                <button
+                  onClick={() => { messageContractor(selectedJob.id); setSelectedJob(null); }}
+                  className="w-full py-2.5 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 text-sm mt-2"
+                  data-testid="modal-message-contractor">
+                  <Mail className="w-4 h-4" /> Message Contractor
                 </button>
               )}
             </div>

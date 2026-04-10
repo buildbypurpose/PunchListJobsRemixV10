@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { Menu, X, ClipboardList, ChevronDown, User, Settings, LogOut, LayoutDashboard, Sliders, Archive, DollarSign } from "lucide-react";
+import { Menu, X, ClipboardList, ChevronDown, User, Settings, LogOut, LayoutDashboard, Sliders, Archive, DollarSign, MessageCircle } from "lucide-react";
+import { useWebSocket } from "../contexts/WebSocketContext";
 
 export default function Navbar({ minimal = false }) {
   const { user, logout } = useAuth();
   const { colors } = useTheme();
+  const { unreadMessages } = useWebSocket();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -72,6 +74,11 @@ export default function Navbar({ minimal = false }) {
                         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-sm text-[#050A30] dark:text-white" data-testid="nav-subscription">
                         <Settings className="w-4 h-4" /> Subscription
                       </Link>
+                      <Link to="/messages" onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-sm text-[#050A30] dark:text-white" data-testid="nav-messages">
+                        <MessageCircle className="w-4 h-4" /> Messages
+                        {unreadMessages > 0 && <span className="ml-auto bg-[#0000FF] text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}
+                      </Link>
                       <Link to="/pay-history" onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-sm text-[#050A30] dark:text-white" data-testid="nav-pay-history">
                         <DollarSign className="w-4 h-4" /> Pay History
@@ -130,6 +137,10 @@ export default function Navbar({ minimal = false }) {
               <Link to={dashboardPath} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
               <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm"><User className="w-4 h-4" /> Profile</Link>
               <Link to="/subscription" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm"><Settings className="w-4 h-4" /> Subscription</Link>
+              <Link to="/messages" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm" data-testid="mobile-nav-messages">
+                <MessageCircle className="w-4 h-4" /> Messages
+                {unreadMessages > 0 && <span className="bg-[#0000FF] text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}
+              </Link>
               <Link to="/pay-history" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm" data-testid="mobile-nav-pay-history"><DollarSign className="w-4 h-4" /> Pay History</Link>
               {["contractor","admin","superadmin"].includes(user.role) && (
                 <Link to="/archive" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm" data-testid="mobile-nav-archive"><Archive className="w-4 h-4" /> Job Archive</Link>

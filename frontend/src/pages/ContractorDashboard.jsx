@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import TradeSelect from "../components/TradeSelect";
@@ -11,7 +12,7 @@ import axios from "axios";
 import {
   Search, Plus, Zap, Users, ClipboardList, Star, MapPin, X, AlertTriangle,
   AlertCircle, Copy, ExternalLink, Share2, UserCheck, Clock,
-  PauseCircle, PlayCircle, Ban, Trash2, Eye, Archive
+  PauseCircle, PlayCircle, Ban, Trash2, Eye, Archive, MessageCircle
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -228,6 +229,7 @@ function CrewCard({ member, onRequest, onViewProfile, isViewerFree }) {
 
 export default function ContractorDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { addListener, connected } = useWebSocket();
   const [jobs, setJobs] = useState([]);
   const [crew, setCrew] = useState([]);
@@ -395,6 +397,24 @@ export default function ContractorDashboard() {
     }
     setRequestingCrew(member);
     setRequestMessage("");
+  };
+
+  const messageAdmin = async () => {
+    try {
+      const { data } = await axios.post(`${API}/messages/threads/admin`);
+      navigate(`/messages?thread=${data.id}`);
+    } catch (e) { toast.error(e?.response?.data?.detail || "Failed to open support chat"); }
+  };
+
+  const messageJobCrew = async (jobId) => {
+    try {
+      const { data } = await axios.post(`${API}/messages/threads/job/${jobId}`);
+      navigate(`/messages?thread=${data.id}`);
+    } catch (e) {
+      const d = e?.response?.data?.detail || "";
+      if (d.includes("UPGRADE_REQUIRED")) toast.error("Upgrade your plan to message crew");
+      else toast.error(d || "Failed to open chat");
+    }
   };
 
   const sendCrewRequest = async () => {
@@ -654,8 +674,15 @@ export default function ContractorDashboard() {
           {/* RIGHT SIDEBAR - Jobs */}
           <div className="lg:col-span-3 space-y-3">
             <div className="card p-4">
-              <h3 className="font-bold text-[#050A30] dark:text-white text-sm mb-3" style={{ fontFamily: "Manrope, sans-serif" }}>My Jobs ({jobs.length})</h3>
-              <div className="grid grid-cols-3 gap-1.5 mb-3">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-[#050A30] dark:text-white text-sm" style={{ fontFamily: "Manrope, sans-serif" }}>My Jobs ({jobs.length})</h3>
+                <button
+                  onClick={messageAdmin}
+                  className="text-xs flex items-center gap-1 text-[#0000FF] dark:text-blue-400 hover:underline font-semibold"
+                  data-testid="contractor-message-admin-btn">
+                  <MessageCircle className="w-3 h-3" /> Admin
+                </button>
+              </div>              <div className="grid grid-cols-3 gap-1.5 mb-3">
                 <div className="text-center bg-emerald-50 dark:bg-emerald-950 rounded-lg p-2">
                   <div className="font-extrabold text-emerald-600 text-lg">{statusCount("open")}</div>
                   <div className="text-xs text-slate-500">Posted</div>
@@ -710,6 +737,13 @@ export default function ContractorDashboard() {
                         className="p-1.5 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
                         data-testid={`reactivate-job-${job.id}`}>
                         <PlayCircle className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {job.crew_accepted?.length > 0 && (
+                      <button onClick={() => messageJobCrew(job.id)} title="Message crew"
+                        className="p-1.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                        data-testid={`message-crew-${job.id}`}>
+                        <MessageCircle className="w-3.5 h-3.5" />
                       </button>
                     )}
                     {["open", "fulfilled", "suspended"].includes(job.status) && (

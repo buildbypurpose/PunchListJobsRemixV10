@@ -32,6 +32,7 @@ from routes.cms_routes import router as cms_router
 from routes.coupon_routes import router as coupon_router
 from routes.boost_routes import router as boost_router
 from routes.trades_routes import router as trades_router
+from routes.message_routes import router as message_router
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(job_router, prefix="/jobs", tags=["jobs"])
@@ -45,6 +46,7 @@ api_router.include_router(cms_router, prefix="/cms", tags=["cms"])
 api_router.include_router(coupon_router, prefix="/coupons", tags=["coupons"])
 api_router.include_router(boost_router, prefix="/boost", tags=["boost"])
 api_router.include_router(trades_router, prefix="/trades", tags=["trades"])
+api_router.include_router(message_router, prefix="/messages", tags=["messages"])
 
 from fastapi import APIRouter as _AR
 from database import db as _db

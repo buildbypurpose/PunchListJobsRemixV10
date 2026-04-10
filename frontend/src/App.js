@@ -16,6 +16,7 @@ import AppSettingsPage from "./pages/AppSettingsPage";
 import ArchivePage from "./pages/ArchivePage";
 import CmsPage from "./pages/CmsPage";
 import PayHistoryPage from "./pages/PayHistoryPage";
+import MessagesPage from "./pages/MessagesPage";
 import OnboardingModal from "./components/OnboardingModal";
 
 const ONBOARDING_KEY = "punchlistjobs_onboarding_done";
@@ -75,10 +76,10 @@ function AppRoutes() {
       <Route path="/" element={user ? <DashboardRedirect /> : <LandingPage />} />
       <Route path="/auth" element={user ? <DashboardRedirect /> : <AuthPage />} />
       <Route path="/crew/dashboard" element={
-        <ProtectedRoute roles={["crew"]}><WebSocketProvider><OnboardingGate><CrewDashboard /></OnboardingGate></WebSocketProvider></ProtectedRoute>
+        <ProtectedRoute roles={["crew"]}><OnboardingGate><CrewDashboard /></OnboardingGate></ProtectedRoute>
       } />
       <Route path="/contractor/dashboard" element={
-        <ProtectedRoute roles={["contractor"]}><WebSocketProvider><OnboardingGate><ContractorDashboard /></OnboardingGate></WebSocketProvider></ProtectedRoute>
+        <ProtectedRoute roles={["contractor"]}><OnboardingGate><ContractorDashboard /></OnboardingGate></ProtectedRoute>
       } />
       <Route path="/admin/dashboard" element={
         <ProtectedRoute roles={["admin", "superadmin"]}><AdminDashboard /></ProtectedRoute>
@@ -87,6 +88,7 @@ function AppRoutes() {
       <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
       <Route path="/pay-history" element={<ProtectedRoute><PayHistoryPage /></ProtectedRoute>} />
+      <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
       <Route path="/archive" element={<ProtectedRoute roles={["contractor","admin","superadmin"]}><ArchivePage /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><AppSettingsPage /></ProtectedRoute>} />
       <Route path="/pages/:slug" element={<CmsPage />} />
@@ -100,8 +102,10 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <AppRoutes />
-          <Toaster position="top-right" richColors />
+          <WebSocketProvider>
+            <AppRoutes />
+            <Toaster position="top-right" richColors />
+          </WebSocketProvider>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

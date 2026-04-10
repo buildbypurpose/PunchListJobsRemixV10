@@ -1,0 +1,54 @@
+{
+  "summary": "Tested in-app messaging feature end-to-end. Found and fixed 2 critical bugs: (1) Navbar.jsx used `unreadMessages` without destructuring from useWebSocket() - ReferenceError. (2) WebSocketProvider was only wrapping dashboard routes, so /messages page crashed with 'useWebSocket must be used within WebSocketProvider'. Fixed by moving WebSocketProvider to app-level in App.js. After fixes, all 13 backend messaging API tests pass and frontend /messages page works correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "/messages page load",
+        "issue": "FIXED: MessagesPage crashed with 'useWebSocket must be used within WebSocketProvider' because WebSocketProvider was only on crew/contractor dashboard routes",
+        "affected_selectors": ["entire MessagesPage"]
+      },
+      {
+        "flow": "Navbar unread badge",
+        "issue": "FIXED: Navbar.jsx referenced `unreadMessages` variable without calling useWebSocket() - would cause ReferenceError on all non-dashboard pages",
+        "affected_selectors": ["[data-testid=\"nav-messages\"]"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_messaging.py",
+    "/app/test_reports/pytest/messaging_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "WebSocketProvider was scoped too narrowly (only crew/contractor dashboards) - any page using useWebSocket (Navbar, MessagesPage) would crash outside dashboards. Fixed by hoisting to app level.",
+    "Navbar.jsx had `useWebSocket` imported but not called, leading to undefined variable usage. Fixed by destructuring unreadMessages from useWebSocket() call."
+  ],
+  "updated_files": [
+    "/app/frontend/src/components/Navbar.jsx",
+    "/app/frontend/src/App.js"
+  ],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% after fixes"},
+  "test_credentials": "crew1@punchlistjobs.com/Crew@123, contractor1@punchlistjobs.com/Contractor@123, admin@punchlistjobs.com/Admin@123",
+  "seed_data_creation": "admin_chat thread was created for crew1 during testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Messaging feature is fully working. Backend APIs 100% pass. Frontend /messages page loads, shows thread list, Navbar dropdown shows Messages link with unread badge. Crew dashboard shows Admin Support button. WebSocketProvider is now at app level (not per-route). Free crew users see upgrade lock on message input (correct).",
+  "rca_of_issues": [
+    {
+      "bug": "MessagesPage crash: useWebSocket must be used within WebSocketProvider",
+      "root_cause": "App.js only wrapped WebSocketProvider around /crew/dashboard and /contractor/dashboard routes. MessagesPage (/messages route) and Navbar on other pages had no WebSocketProvider ancestor.",
+      "fix": "Moved WebSocketProvider from per-route to wrap the entire BrowserRouter in App.js"
+    },
+    {
+      "bug": "Navbar unread badge - ReferenceError: unreadMessages is not defined",
+      "root_cause": "Navbar.jsx imported useWebSocket but never called it, yet used `unreadMessages` on lines 79 and 141",
+      "fix": "Added `const { unreadMessages } = useWebSocket();` in Navbar component"
+    }
+  ]
+}

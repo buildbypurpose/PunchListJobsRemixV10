@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "./AuthContext";
+import axios from "axios";
 
 const WS_URL = process.env.REACT_APP_BACKEND_URL
   ? process.env.REACT_APP_BACKEND_URL.replace(/^https?/, "wss").replace(/^http/, "ws")
   : "ws://localhost:8001";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
 
 const WebSocketContext = createContext(null);
 
@@ -12,8 +15,19 @@ export function WebSocketProvider({ children }) {
   const ws = useRef(null);
   const [connected, setConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const listeners = useRef([]);
   const reconnectTimer = useRef(null);
+
+  // Poll unread message count
+  useEffect(() => {
+    if (!token) { setUnreadMessages(0); return; }
+    const fetch = () => axios.get(`${BACKEND_URL}/api/messages/unread-count`)
+      .then(r => setUnreadMessages(r.data.count || 0)).catch(() => {});
+    fetch();
+    const id = setInterval(fetch, 30000);
+    return () => clearInterval(id);
+  }, [token]);
 
   const connect = useCallback(() => {
     if (!token || ws.current?.readyState === WebSocket.OPEN) return;
@@ -30,6 +44,10 @@ export function WebSocketProvider({ children }) {
         const data = JSON.parse(evt.data);
         setLastMessage(data);
         listeners.current.forEach(fn => fn(data));
+        // Increment unread badge for new messages from others
+        if (data.type === "new_message") {
+          setUnreadMessages(c => c + 1);
+        }
       } catch { }
     };
 
@@ -72,7 +90,7 @@ export function WebSocketProvider({ children }) {
   }, [sendMessage]);
 
   return (
-    <WebSocketContext.Provider value={{ connected, lastMessage, sendMessage, addListener, sendLocation }}>
+    <WebSocketContext.Provider value={{ connected, lastMessage, sendMessage, addListener, sendLocation, unreadMessages, setUnreadMessages }}>
       {children}
     </WebSocketContext.Provider>
   );
