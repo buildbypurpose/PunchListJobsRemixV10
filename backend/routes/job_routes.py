@@ -66,6 +66,7 @@ async def create_job(data: JobCreate, current_user: dict = Depends(get_current_u
 
 
 @router.get("/")
+@router.get("")
 async def list_jobs(
     status: Optional[str] = None,
     trade: Optional[str] = None,
