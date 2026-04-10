@@ -45,7 +45,12 @@ Import code from GitHub (https://github.com/buildbypurpose/PunchListJobsRemixV9.
 - Backend seeded with demo accounts (superadmin, admin, 5 crew, 3 contractors)
 - All services running via supervisor
 
-### Session 8 (Back Button + Crew Dashboard + ContractorDashboard) — April 2026
+### Session 9 (In-App Messaging) — April 2026
+- **Full messaging system**: Two thread types: `job_chat` (crew↔contractor per job) and `admin_chat` (any user↔admin support)
+- **Backend**: `message_routes.py` — GET/POST threads, send, mark-read, unread-count. Crew auto-added to job thread with contractor. Admin auto-joins thread on first reply
+- **MessagesPage.jsx** (`/messages`): Two-panel layout — thread list left, chat right. Mobile-responsive. Real-time WS push (`new_message` events). Free-tier upgrade prompt on send
+- **Navbar badge**: Unread message count polled every 30s + incremented live via WS events. WebSocketProvider moved to app-level to support all routes
+- **Integration buttons**: Crew dashboard "Admin Support" button + "Message Contractor" in job preview (accepted jobs only). Contractor dashboard "Admin" button + "Message Crew" on each job with accepted crew
 - **Back Button Fix** (ProfilePage.jsx): `navigate(-1)` → `window.history.state?.idx > 0 ? navigate(-1) : navigate('/')` — prevents exiting app when profile opened in new tab
 - **Preview button on job cards** (JobCard.jsx): Added `onPreview` prop + `<Eye /> Preview` button, shown for crew when handler provided
 - **selectedJob modal enhanced** (CrewDashboard.jsx): Full details (crew count, start time, location) + contractor contact info fetched from `/api/users/public/{contractor_id}` (phone/email with free-tier masking). Modal z-index raised to `z-50`
