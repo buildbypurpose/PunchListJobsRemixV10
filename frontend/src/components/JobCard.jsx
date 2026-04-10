@@ -4,12 +4,18 @@ import { MapPin, Clock, DollarSign, Users, AlertTriangle, Bookmark, CheckCircle,
 const STATUS_COLORS = {
   open: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
   fulfilled: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300",
-  in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+  in_progress: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
   completed_pending_review: "bg-orange-100 text-orange-700",
   completed: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
   suspended: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
   cancelled: "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400",
   draft: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
+};
+
+// Left-border accent per status
+const CARD_ACCENTS = {
+  fulfilled:   "border-l-4 border-yellow-400",
+  in_progress: "border-l-4 border-emerald-500",
 };
 
 const STATUS_LABELS = {
@@ -50,7 +56,9 @@ export default function JobCard({ job, onAccept, onStart, onComplete, onVerify, 
   return (
     <div
       className={`card p-4 transition-all duration-200 hover:shadow-md cursor-pointer ${
-        job.is_emergency ? "border-l-4 border-red-500" : ""
+        job.is_emergency
+          ? "border-l-4 border-red-500"
+          : CARD_ACCENTS[job.status] || ""
       }`}
       data-testid={`job-card-${job.id}`}
     >
@@ -146,7 +154,7 @@ export default function JobCard({ job, onAccept, onStart, onComplete, onVerify, 
             <CheckCircle className="w-4 h-4" /> Accepted
           </span>
         )}
-        {isContractor && job.status === "fulfilled" && (
+        {isContractor && ["open", "fulfilled"].includes(job.status) && crewCount >= 1 && (
           <button
             onClick={() => onStart?.(job.id)}
             className="flex-1 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition-colors"

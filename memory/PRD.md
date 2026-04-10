@@ -45,7 +45,12 @@ Import code from GitHub (https://github.com/buildbypurpose/PunchListJobsRemixV9.
 - Backend seeded with demo accounts (superadmin, admin, 5 crew, 3 contractors)
 - All services running via supervisor
 
-### Session 9 (In-App Messaging) — April 2026
+### Session 10 (Job Card Colors, Notifications, Admin Messaging, Thread Archive) — April 2026
+- **Job card colors**: `in_progress` badge changed blue→green. Added `border-l-4 border-yellow-400` for fulfilled (Accepted) and `border-l-4 border-emerald-500` for in_progress cards
+- **Start Job**: Now shows when `crewCount >= 1` (at least 1 crew accepted), not gated on `fulfilled` only
+- **Mobile push/banner**: WebSocket `new_message` → browser Notification API (with permission request) + in-app sonner toast with "View" action button. Works when app is backgrounded or foregrounded
+- **Admin initiate conversation**: New `POST /api/messages/threads/initiate/{user_id}` endpoint. "Message" icon (MessageCircle) added to every non-admin user row in AdminDashboard. Navigates to `/messages?thread=...`
+- **Archive/delete threads**: New `DELETE /api/messages/threads/{thread_id}` endpoint (admin/superadmin only). Trash icon appears on hover for each thread in MessagesPage (admin only). Deletes thread + all messages
 - **Full messaging system**: Two thread types: `job_chat` (crew↔contractor per job) and `admin_chat` (any user↔admin support)
 - **Backend**: `message_routes.py` — GET/POST threads, send, mark-read, unread-count. Crew auto-added to job thread with contractor. Admin auto-joins thread on first reply
 - **MessagesPage.jsx** (`/messages`): Two-panel layout — thread list left, chat right. Mobile-responsive. Real-time WS push (`new_message` events). Free-tier upgrade prompt on send

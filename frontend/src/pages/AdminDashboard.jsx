@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import WysiwygEditor from "../components/WysiwygEditor";
 import { toast } from "sonner";
@@ -12,7 +13,7 @@ import {
   Users, ClipboardList, DollarSign, TrendingUp, Shield, Settings, FileText,
   Edit, Trash2, Check, X, Search, ChevronLeft, ChevronRight,
   PlusCircle, Download, Upload, Key, BookOpen, HelpCircle, Info,
-  UserPlus, Star, ChevronDown, ChevronUp, Pause, Play, Ban, Award
+  UserPlus, Star, ChevronDown, ChevronUp, Pause, Play, Ban, Award, MessageCircle
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -46,6 +47,7 @@ const JOB_STATUS_COLORS = {
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isSuperAdmin = user?.role === "superadmin";
   const isAdminRole  = user?.role === "admin";
   const TABS = [
@@ -723,6 +725,21 @@ export default function AdminDashboard() {
                             <button onClick={() => deleteUser(u.id)} className="p-1.5 rounded text-red-500 hover:bg-red-50" title="Delete" data-testid={`admin-delete-user-${u.id}`}>
                               <Trash2 className="w-4 h-4" />
                             </button>
+                            {!["admin","superadmin","subadmin"].includes(u.role) && (
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    const { data } = await axios.post(`${API}/messages/threads/initiate/${u.id}`);
+                                    navigate(`/messages?thread=${data.id}`);
+                                  } catch (e) { toast.error(e?.response?.data?.detail || "Failed"); }
+                                }}
+                                className="p-1.5 rounded text-blue-500 hover:bg-blue-50"
+                                title="Message User"
+                                data-testid={`admin-message-user-${u.id}`}
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

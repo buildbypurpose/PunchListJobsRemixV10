@@ -7,7 +7,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import {
   MessageCircle, Send, ChevronLeft, Briefcase, Shield, Loader2,
-  MessageSquare, Lock
+  MessageSquare, Lock, Trash2
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -23,7 +23,7 @@ function formatTime(iso) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function ThreadItem({ thread, active, myId, onClick }) {
+function ThreadItem({ thread, active, myId, isAdmin, onDelete, onClick }) {
   const isJob = thread.type === "job_chat";
   const other = thread.participants?.find(p => p.user_id !== myId);
   const label = isJob ? thread.job_title : (thread.user_name || other?.name || "Support");
@@ -33,7 +33,7 @@ function ThreadItem({ thread, active, myId, onClick }) {
     <button
       onClick={onClick}
       data-testid={`thread-item-${thread.id}`}
-      className={`w-full text-left px-4 py-3 border-b border-slate-200 dark:border-slate-800 transition-colors flex items-start gap-3 ${
+      className={`w-full text-left px-4 py-3 border-b border-slate-200 dark:border-slate-800 transition-colors flex items-start gap-3 group ${
         active ? "bg-blue-50 dark:bg-blue-950/50" : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
       }`}
     >
@@ -45,7 +45,19 @@ function ThreadItem({ thread, active, myId, onClick }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1">
           <p className="text-sm font-semibold text-[#050A30] dark:text-white truncate">{label}</p>
-          <span className="text-xs text-slate-400 flex-shrink-0">{formatTime(thread.last_message_at)}</span>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <span className="text-xs text-slate-400">{formatTime(thread.last_message_at)}</span>
+            {isAdmin && (
+              <button
+                onClick={(e) => onDelete(thread.id, e)}
+                className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-red-400 hover:text-red-600 transition-all"
+                data-testid={`delete-thread-${thread.id}`}
+                title="Delete thread"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-xs text-slate-500 truncate">{sub}</p>
         <p className="text-xs text-slate-400 truncate mt-0.5">{thread.last_message || "No messages yet"}</p>
@@ -185,8 +197,16 @@ export default function MessagesPage() {
     }
   };
 
-  const isFree = ["free", "expired"].includes(user?.subscription_status) && !isAdmin;
-
+  const deleteThread = async (threadId, e) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this thread and all messages?")) return;
+    try {
+      await axios.delete(`${API}/messages/threads/${threadId}`);
+      setThreads(prev => prev.filter(t => t.id !== threadId));
+      if (activeThread?.id === threadId) { setActiveThread(null); setMessages([]); setShowList(true); }
+      toast.success("Thread deleted");
+    } catch { toast.error("Failed to delete thread"); }
+  };
   return (
     <div className="min-h-screen bg-[#050A30]" style={{ fontFamily: "Inter, sans-serif" }}>
       <Navbar />
@@ -220,6 +240,8 @@ export default function MessagesPage() {
                       thread={t}
                       active={activeThread?.id === t.id}
                       myId={user?.id}
+                      isAdmin={isAdmin}
+                      onDelete={deleteThread}
                       onClick={() => openThread(t.id)}
                     />
                   ))

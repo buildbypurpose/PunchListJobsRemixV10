@@ -268,3 +268,76 @@ async def unread_count(current_user: dict = Depends(get_current_user)):
 
     total = sum(t.get("unread", {}).get(uid, 0) for t in threads)
     return {"count": total}
+
+
+# ── POST /threads/initiate/{user_id} — Admin initiates thread with a user ─────
+
+@router.post("/threads/initiate/{user_id}")
+async def admin_initiate_thread(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Admin starts a support thread with any user."""
+    if current_user["role"] not in ("admin", "superadmin", "subadmin"):
+        raise HTTPException(status_code=403, detail="Admins only")
+
+    target = await db.users.find_one({"id": user_id}, {"_id": 0, "id": 1, "name": 1, "role": 1})
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if target["role"] in ("admin", "superadmin", "subadmin"):
+        raise HTTPException(status_code=400, detail="Cannot initiate thread with another admin")
+
+    # Return existing thread if already present
+    existing = await db.msg_threads.find_one(
+        {"type": "admin_chat", "participant_ids": user_id}, {"_id": 0}
+    )
+    if existing:
+        existing.pop("_id", None)
+        return existing
+
+    # Build participant list (target user + all admins)
+    admins = await db.users.find(
+        {"role": {"$in": ["admin", "superadmin"]}},
+        {"_id": 0, "id": 1, "name": 1, "role": 1}
+    ).to_list(10)
+
+    participants = [{"user_id": target["id"], "name": target["name"], "role": target["role"]}]
+    participant_ids = [target["id"]]
+    for a in admins:
+        if a["id"] not in participant_ids:
+            participants.append({"user_id": a["id"], "name": a["name"], "role": a["role"]})
+            participant_ids.append(a["id"])
+    # Ensure initiating admin is included
+    if current_user["id"] not in participant_ids:
+        participants.append({"user_id": current_user["id"], "name": current_user["name"], "role": current_user["role"]})
+        participant_ids.append(current_user["id"])
+
+    thread = {
+        "id": str(uuid.uuid4()),
+        "type": "admin_chat",
+        "job_id": None,
+        "job_title": None,
+        "user_name": target["name"],
+        "user_role": target["role"],
+        "participants": participants,
+        "participant_ids": participant_ids,
+        "last_message": None,
+        "last_message_at": _now(),
+        "unread": {pid: 0 for pid in participant_ids},
+        "created_at": _now(),
+    }
+    await db.msg_threads.insert_one(thread)
+    thread.pop("_id", None)
+    return thread
+
+
+# ── DELETE /threads/{thread_id} — Admin archives/deletes a thread ─────────────
+
+@router.delete("/threads/{thread_id}")
+async def delete_thread(thread_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ("admin", "superadmin"):
+        raise HTTPException(status_code=403, detail="Admins only")
+    thread = await db.msg_threads.find_one({"id": thread_id})
+    if not thread:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    await db.msg_threads.delete_one({"id": thread_id})
+    await db.msg_messages.delete_many({"thread_id": thread_id})
+    return {"message": "Thread deleted"}

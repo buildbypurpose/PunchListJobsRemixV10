@@ -29,6 +29,13 @@ export function WebSocketProvider({ children }) {
     return () => clearInterval(id);
   }, [token]);
 
+  // Request browser notification permission on first connection
+  useEffect(() => {
+    if (token && "Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().catch(() => {});
+    }
+  }, [token]);
+
   const connect = useCallback(() => {
     if (!token || ws.current?.readyState === WebSocket.OPEN) return;
 
@@ -47,6 +54,25 @@ export function WebSocketProvider({ children }) {
         // Increment unread badge for new messages from others
         if (data.type === "new_message") {
           setUnreadMessages(c => c + 1);
+          // Mobile/browser push notification
+          const msg = data.message || {};
+          const senderName = msg.sender_name || "New message";
+          const content = msg.content || "";
+          if ("Notification" in window && Notification.permission === "granted" && document.visibilityState === "hidden") {
+            new Notification(`${senderName}`, {
+              body: content.length > 80 ? content.slice(0, 77) + "…" : content,
+              icon: "/logo192.png",
+              tag: data.thread_id,
+            });
+          }
+          // In-app banner via sonner toast (always shown)
+          if (document.visibilityState === "visible") {
+            const { toast: showToast } = require("sonner");
+            showToast(`${senderName}: ${content.length > 60 ? content.slice(0, 57) + "…" : content}`, {
+              duration: 4000,
+              action: { label: "View", onClick: () => { window.location.href = `/messages?thread=${data.thread_id}`; } },
+            });
+          }
         }
       } catch { }
     };
