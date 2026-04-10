@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Clock, DollarSign, Users, AlertTriangle, Bookmark, CheckCircle } from "lucide-react";
+import { MapPin, Clock, DollarSign, Users, AlertTriangle, Bookmark, CheckCircle, Eye } from "lucide-react";
 
 const STATUS_COLORS = {
   open: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
@@ -41,7 +41,7 @@ function formatTime(timeStr) {
   } catch { return timeStr; }
 }
 
-export default function JobCard({ job, onAccept, onStart, onComplete, onVerify, onRate, currentUser, isAccepted }) {
+export default function JobCard({ job, onAccept, onStart, onComplete, onVerify, onRate, onPreview, currentUser, isAccepted }) {
   const isCrew = currentUser?.role === "crew";
   const isContractor = currentUser?.role === "contractor";
   const crewCount = job.crew_accepted?.length || 0;
@@ -114,6 +114,15 @@ export default function JobCard({ job, onAccept, onStart, onComplete, onVerify, 
 
       {/* Actions */}
       <div className="flex gap-2 flex-wrap">
+        {isCrew && onPreview && (
+          <button
+            onClick={() => onPreview(job)}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors flex items-center gap-1"
+            data-testid={`preview-job-${job.id}`}
+          >
+            <Eye className="w-3 h-3" /> Preview
+          </button>
+        )}
         {isCrew && job.status === "open" && !isAccepted && (
           <button
             onClick={() => onAccept?.(job.id)}

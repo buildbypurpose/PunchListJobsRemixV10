@@ -269,6 +269,26 @@ async def permanent_delete_job(job_id: str, current_user: dict = Depends(get_cur
     return {"message": "Job permanently deleted"}
 
 
+@router.post("/{job_id}/withdraw")
+async def withdraw_from_job(job_id: str, current_user: dict = Depends(get_current_user)):
+    """Crew member removes themselves from an accepted job."""
+    if current_user["role"] != "crew":
+        raise HTTPException(status_code=403, detail="Only crew can withdraw")
+    job = await db.jobs.find_one({"id": job_id})
+    if not job:
+        raise HTTPException(status_code=404, detail="Not found")
+    if current_user["id"] not in job.get("crew_accepted", []):
+        raise HTTPException(status_code=400, detail="Not accepted on this job")
+    crew = [c for c in job.get("crew_accepted", []) if c != current_user["id"]]
+    new_status = "fulfilled" if len(crew) >= job.get("crew_needed", 1) else "open"
+    await db.jobs.update_one({"id": job_id}, {"$set": {"crew_accepted": crew, "status": new_status}})
+    await log_activity(
+        actor=current_user, action="job.withdrawn", category="job",
+        target_id=job_id, target_type="job", details={"title": job["title"]}
+    )
+    return {"message": "Withdrawn from job"}
+
+
 @router.post("/{job_id}/cancel")
 async def cancel_job(job_id: str, archive: bool = False, current_user: dict = Depends(get_current_user)):
     """Cancel a job and notify all accepted crew. Pass ?archive=true to also archive."""

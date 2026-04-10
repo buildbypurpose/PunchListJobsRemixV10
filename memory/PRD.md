@@ -45,7 +45,12 @@ Import code from GitHub (https://github.com/buildbypurpose/PunchListJobsRemixV9.
 - Backend seeded with demo accounts (superadmin, admin, 5 crew, 3 contractors)
 - All services running via supervisor
 
-### Session 7 (PayPal, Pay History, Captcha, Icon Cleanup) — April 2026
+### Session 8 (Back Button + Crew Dashboard + ContractorDashboard) — April 2026
+- **Back Button Fix** (ProfilePage.jsx): `navigate(-1)` → `window.history.state?.idx > 0 ? navigate(-1) : navigate('/')` — prevents exiting app when profile opened in new tab
+- **Preview button on job cards** (JobCard.jsx): Added `onPreview` prop + `<Eye /> Preview` button, shown for crew when handler provided
+- **selectedJob modal enhanced** (CrewDashboard.jsx): Full details (crew count, start time, location) + contractor contact info fetched from `/api/users/public/{contractor_id}` (phone/email with free-tier masking). Modal z-index raised to `z-50`
+- **Withdraw (Suspend) toggle** (CrewDashboard.jsx): My Active Jobs now includes `suspended` status. Active jobs show "Withdraw" button → calls new `POST /api/jobs/{id}/withdraw` endpoint. Suspended jobs show "Suspended by contractor" badge
+- **CrewProfileModal z-index fix** (ContractorDashboard.jsx): `z-[10]` → `z-50` so View Profile modal renders above all content
 - **PayPal** - Already fully implemented (SubscriptionPage.jsx + `/api/payments/paypal/pay`). Added `REACT_APP_PAYPAL_CLIENT_ID=sb` (sandbox) to frontend .env
 - **Pay History Page** - New `/pay-history` route with daily/weekly/monthly/yearly totals. Users see own transactions; Admins see all users. Backend: `GET /api/payments/history` + `GET /api/admin/payments/history`
 - **Captcha fix** - Added Google test reCAPTCHA keys to frontend/backend .env so the widget renders and passes verification

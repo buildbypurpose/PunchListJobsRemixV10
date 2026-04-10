@@ -73,7 +73,7 @@ function CrewProfileModal({ userId, onClose }) {
   };
 
   if (loading) return (
-    <div className="fixed inset-0 bg-black/50 z-[10] flex items-center justify-center" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="card p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0000FF] mx-auto" /></div>
     </div>
   );
@@ -82,7 +82,7 @@ function CrewProfileModal({ userId, onClose }) {
   const photo = profile.profile_photo || profile.logo;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[10] flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="card max-w-sm w-full p-6 relative" onClick={e => e.stopPropagation()} data-testid="crew-profile-modal">
         <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
 
