@@ -15,6 +15,7 @@ import SubscriptionPage from "./pages/SubscriptionPage";
 import AppSettingsPage from "./pages/AppSettingsPage";
 import ArchivePage from "./pages/ArchivePage";
 import CmsPage from "./pages/CmsPage";
+import PayHistoryPage from "./pages/PayHistoryPage";
 import OnboardingModal from "./components/OnboardingModal";
 
 const ONBOARDING_KEY = "punchlistjobs_onboarding_done";
@@ -85,6 +86,7 @@ function AppRoutes() {
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+      <Route path="/pay-history" element={<ProtectedRoute><PayHistoryPage /></ProtectedRoute>} />
       <Route path="/archive" element={<ProtectedRoute roles={["contractor","admin","superadmin"]}><ArchivePage /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><AppSettingsPage /></ProtectedRoute>} />
       <Route path="/pages/:slug" element={<CmsPage />} />

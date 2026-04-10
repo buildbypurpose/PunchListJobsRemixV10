@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import {
   MapPin, List, Filter, Zap, Clock, Star, RefreshCw, AlertCircle, X,
-  CheckCircle, Camera, Phone, Navigation, Briefcase, FileText, ToggleLeft, ToggleRight, AlertTriangle,
+  CheckCircle, Camera, Phone, Navigation, ClipboardList, FileText, ToggleLeft, ToggleRight, AlertTriangle,
   UserCheck, UserX, MessageCircle
 } from "lucide-react";
 
@@ -410,7 +410,7 @@ export default function CrewDashboard() {
                     { key: "photo", icon: Camera, label: "Profile Photo" },
                     { key: "phone", icon: Phone, label: "Phone Number" },
                     { key: "address", icon: MapPin, label: "Location/Address" },
-                    { key: "skills", icon: Briefcase, label: "Trade/Skills" },
+                    { key: "skills", icon: ClipboardList, label: "Trade/Skills" },
                     { key: "bio", icon: FileText, label: "Bio" },
                   ].map(({ key, icon: Icon, label }) => (
                     <div key={key} className="flex items-center gap-2">

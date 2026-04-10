@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import { toast } from "sonner";
 import {
-  Volume2, VolumeX, Bell, BellOff, Vibrate, Briefcase, UserCheck,
+  Volume2, VolumeX, Bell, BellOff, Vibrate, ClipboardList, UserCheck,
   UserX, BarChart2, Save, RotateCcw, Play
 } from "lucide-react";
 
@@ -192,7 +192,7 @@ export default function AppSettingsPage() {
           <p className="text-xs text-slate-400 mb-4">Choose which events trigger notifications</p>
 
           <SettingRow
-            icon={Briefcase}
+            icon={ClipboardList}
             label="New Jobs"
             description="Get notified when new job postings match your trade"
             testId="new-jobs-setting">

@@ -668,3 +668,46 @@ async def delete_subadmin(sub_id: str, admin: dict = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="SubAdmin not found")
     await db.users.delete_one({"id": sub_id})
     return {"message": "SubAdmin deleted"}
+
+
+# ─── GET /payments/history — All payments with period totals (admin) ──────────
+
+@router.get("/payments/history")
+async def admin_payments_history(admin: dict = Depends(require_admin)):
+    txs = await db.payment_transactions.find({}, {"_id": 0}).sort("created_at", -1).to_list(2000)
+
+    # Attach user info
+    user_ids = list({tx["user_id"] for tx in txs})
+    users = await db.users.find(
+        {"id": {"$in": user_ids}}, {"_id": 0, "id": 1, "name": 1, "email": 1}
+    ).to_list(2000)
+    user_map = {u["id"]: u for u in users}
+    for tx in txs:
+        u = user_map.get(tx["user_id"], {})
+        tx["user_name"]  = u.get("name", "Unknown")
+        tx["user_email"] = u.get("email", "")
+
+    now = datetime.now(timezone.utc)
+    day_start   = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start  = day_start - timedelta(days=now.weekday())
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    year_start  = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    completed = [tx for tx in txs if tx.get("status") == "completed"]
+
+    def _total(start):
+        return round(sum(
+            tx["amount"] for tx in completed
+            if datetime.fromisoformat(tx["created_at"].replace("Z","")) >= start
+        ), 2)
+
+    return {
+        "transactions": txs,
+        "totals": {
+            "daily":    _total(day_start),
+            "weekly":   _total(week_start),
+            "monthly":  _total(month_start),
+            "yearly":   _total(year_start),
+            "all_time": round(sum(tx["amount"] for tx in completed), 2),
+        },
+    }

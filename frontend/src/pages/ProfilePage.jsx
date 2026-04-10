@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import TradeSelect from "../components/TradeSelect";
 import axios from "axios";
 import {
-  Camera, Star, Gift, Copy, Check, Edit2, Save, MapPin, Phone, Briefcase,
+  Camera, Star, Gift, Copy, Check, Edit2, Save, MapPin, Phone, ClipboardList,
   User, Plus, X, Linkedin, Twitter, Facebook, Share2, Eye, Zap, ImagePlus, Trash2
 } from "lucide-react";
 
@@ -717,7 +717,7 @@ export default function ProfilePage() {
                   {[
                     { icon: User, label: "Name", value: user?.name },
                     { icon: Phone, label: "Phone", value: user?.phone || "Not set" },
-                    { icon: Briefcase, label: user?.role === "contractor" ? "Company" : "Trade", value: (user?.role === "contractor" ? user?.company_name : user?.trade) || "Not set" },
+                    { icon: ClipboardList, label: user?.role === "contractor" ? "Company" : "Trade", value: (user?.role === "contractor" ? user?.company_name : user?.trade) || "Not set" },
                     { icon: MapPin, label: "Address", value: displayAddress },
                     ...(user?.address ? [{ icon: MapPin, label: "Address", value: user.address }] : []),
                   ].map(item => (

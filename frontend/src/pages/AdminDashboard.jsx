@@ -9,7 +9,7 @@ import {
   PieChart, Pie, Cell
 } from "recharts";
 import {
-  Users, Briefcase, DollarSign, TrendingUp, Shield, Settings, FileText,
+  Users, ClipboardList, DollarSign, TrendingUp, Shield, Settings, FileText,
   Edit, Trash2, Check, X, Search, ChevronLeft, ChevronRight,
   PlusCircle, Download, Upload, Key, BookOpen, HelpCircle, Info,
   UserPlus, Star, ChevronDown, ChevronUp, Pause, Play, Ban, Award
@@ -444,7 +444,7 @@ export default function AdminDashboard() {
 
   const statCards = analytics ? [
     { label: "Total Users",    value: analytics.total_users,                   icon: Users,      color: "#0000FF", bg: "#EEF2FF" },
-    { label: "Active Jobs",    value: analytics.active_jobs,                   icon: Briefcase,  color: "#10B981", bg: "#ECFDF5" },
+    { label: "Active Jobs",    value: analytics.active_jobs,                   icon: ClipboardList,  color: "#10B981", bg: "#ECFDF5" },
     { label: "Completed Jobs", value: analytics.completed_jobs,                icon: TrendingUp, color: "#F59E0B", bg: "#FFFBEB" },
     { label: "Revenue",        value: `$${analytics.total_revenue?.toFixed(2)}`, icon: DollarSign, color: "#8B5CF6", bg: "#F5F3FF" },
   ] : [];
@@ -931,7 +931,7 @@ export default function AdminDashboard() {
               {/* Top by Jobs */}
               <div className="card p-5">
                 <div className="flex items-center gap-2 mb-5">
-                  <Briefcase className="w-5 h-5 text-[#0000FF]" />
+                  <ClipboardList className="w-5 h-5 text-[#0000FF]" />
                   <h3 className="font-bold text-[#050A30] dark:text-white" style={{ fontFamily: "Manrope, sans-serif" }}>Top by Jobs Completed</h3>
                 </div>
                 <div className="space-y-3">

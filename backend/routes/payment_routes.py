@@ -254,3 +254,36 @@ async def get_transactions(current_user: dict = Depends(get_current_user)):
         {"user_id": current_user["id"]}, {"_id": 0}
     ).sort("created_at", -1).to_list(100)
     return txs
+
+
+# ─── GET /history — Transactions + period totals ──────────────────────────────
+
+@router.get("/history")
+async def payment_history(current_user: dict = Depends(get_current_user)):
+    txs = await db.payment_transactions.find(
+        {"user_id": current_user["id"]}, {"_id": 0}
+    ).sort("created_at", -1).to_list(500)
+
+    now = datetime.now(timezone.utc)
+    day_start  = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = day_start - timedelta(days=now.weekday())
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    year_start  = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    def _total(start):
+        return round(sum(
+            tx["amount"] for tx in txs
+            if tx.get("status") == "completed" and
+               datetime.fromisoformat(tx["created_at"].replace("Z","")) >= start
+        ), 2)
+
+    return {
+        "transactions": txs,
+        "totals": {
+            "daily":   _total(day_start),
+            "weekly":  _total(week_start),
+            "monthly": _total(month_start),
+            "yearly":  _total(year_start),
+            "all_time": round(sum(tx["amount"] for tx in txs if tx.get("status") == "completed"), 2),
+        },
+    }

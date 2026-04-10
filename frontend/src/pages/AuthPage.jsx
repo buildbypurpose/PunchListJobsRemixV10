@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
 import axios from "axios";
-import { Eye, EyeOff, Briefcase, Users, ArrowLeft, CheckCircle, KeyRound, Mail } from "lucide-react";
+import { Eye, EyeOff, ClipboardList, Users, ArrowLeft, CheckCircle, KeyRound, Mail } from "lucide-react";
 import TradeSelect from "../components/TradeSelect";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -136,7 +136,7 @@ export default function AuthPage() {
         <div className="absolute inset-0 flex flex-col justify-between p-12">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-[#0000FF] rounded-xl flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-white" />
+              <ClipboardList className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="text-white font-extrabold text-xl" style={{ fontFamily: "Manrope, sans-serif" }}>PunchListJobs</div>
@@ -318,7 +318,7 @@ export default function AuthPage() {
                 className={`flex-1 flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 font-bold text-sm transition-all ${role === "contractor" ? "border-[#0000FF] bg-blue-50 dark:bg-blue-950 text-[#0000FF]" : "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300"}`}
                 data-testid="role-contractor-btn"
               >
-                <Briefcase className="w-5 h-5" />
+                <ClipboardList className="w-5 h-5" />
                 Contractor
               </button>
             </div>

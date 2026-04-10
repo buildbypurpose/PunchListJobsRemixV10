@@ -9,7 +9,7 @@ import JobMap from "../components/JobMap";
 import { toast } from "sonner";
 import axios from "axios";
 import {
-  Search, Plus, Zap, Users, Briefcase, Star, MapPin, X, AlertTriangle,
+  Search, Plus, Zap, Users, ClipboardList, Star, MapPin, X, AlertTriangle,
   AlertCircle, Copy, ExternalLink, Share2, UserCheck, Clock,
   PauseCircle, PlayCircle, Ban, Trash2, Eye, Archive
 } from "lucide-react";
@@ -674,7 +674,7 @@ export default function ContractorDashboard() {
             <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
               {jobs.length === 0 ? (
                 <div className="card p-6 text-center">
-                  <Briefcase className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                  <ClipboardList className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                   <p className="text-slate-500 font-semibold text-sm">No jobs yet</p>
                   <button onClick={() => setShowJobForm(true)} className="mt-3 text-[#0000FF] text-sm font-semibold">Post your first job</button>
                 </div>

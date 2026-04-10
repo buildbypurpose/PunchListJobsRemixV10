@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Zap, Star, Users, Briefcase, Shield, ArrowRight } from "lucide-react";
+import { MapPin, Zap, Star, Users, ClipboardList, Shield, ArrowRight } from "lucide-react";
 
 const HERO_BG = "https://images.unsplash.com/photo-1760009436767-d154e930e55c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwzfHxjb25zdHJ1Y3Rpb24lMjBzaXRlJTIwdGVhbSUyMHdvcmtpbmd8ZW58MHx8fHwxNzczMzk4OTM5fDA&ixlib=rb-4.1.0&q=85";
 
@@ -45,7 +45,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: "var(--theme-brand)" }}>
-              <Briefcase className="w-5 h-5 text-white" />
+              <ClipboardList className="w-5 h-5 text-white" />
             </div>
             <div className="hidden sm:block">
               <div className="text-white font-extrabold text-lg" style={{ fontFamily: "Manrope, sans-serif" }}>PunchListJobs</div>
@@ -86,7 +86,7 @@ export default function LandingPage() {
               <Link to="/auth?mode=register&role=contractor"
                 className="flex items-center justify-center gap-2 bg-white text-[#050A30] px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all hover:scale-105 shadow-lg"
                 data-testid="hero-contractor-signup">
-                <Briefcase className="w-5 h-5" /> Contractor Sign Up
+                <ClipboardList className="w-5 h-5" /> Contractor Sign Up
               </Link>
             </div>
             <p className="text-slate-400 text-sm mt-4">Free plan included &bull; No credit card required</p>
@@ -209,7 +209,7 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-[#0000FF] rounded-lg flex items-center justify-center">
-                  <Briefcase className="w-4 h-4 text-white" />
+                  <ClipboardList className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-white font-extrabold" style={{ fontFamily: "Manrope, sans-serif" }}>PunchListJobs</span>
               </div>

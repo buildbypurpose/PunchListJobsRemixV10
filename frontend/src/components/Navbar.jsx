@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { Menu, X, Briefcase, ChevronDown, User, Settings, LogOut, LayoutDashboard, Sliders, Archive } from "lucide-react";
+import { Menu, X, ClipboardList, ChevronDown, User, Settings, LogOut, LayoutDashboard, Sliders, Archive, DollarSign } from "lucide-react";
 
 export default function Navbar({ minimal = false }) {
   const { user, logout } = useAuth();
@@ -25,7 +25,7 @@ export default function Navbar({ minimal = false }) {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: "var(--theme-brand)" }}>
-              <Briefcase className="w-5 h-5 text-white" />
+              <ClipboardList className="w-5 h-5 text-white" />
             </div>
             <div className="hidden sm:block">
               <div className="text-white font-extrabold text-lg leading-none" style={{ fontFamily: "Manrope, sans-serif" }}>PunchListJobs</div>
@@ -71,6 +71,10 @@ export default function Navbar({ minimal = false }) {
                       <Link to="/subscription" onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-sm text-[#050A30] dark:text-white" data-testid="nav-subscription">
                         <Settings className="w-4 h-4" /> Subscription
+                      </Link>
+                      <Link to="/pay-history" onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-sm text-[#050A30] dark:text-white" data-testid="nav-pay-history">
+                        <DollarSign className="w-4 h-4" /> Pay History
                       </Link>
                       {["contractor","admin","superadmin"].includes(user.role) && (
                         <Link to="/archive" onClick={() => setDropdownOpen(false)}
@@ -126,6 +130,7 @@ export default function Navbar({ minimal = false }) {
               <Link to={dashboardPath} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
               <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm"><User className="w-4 h-4" /> Profile</Link>
               <Link to="/subscription" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm"><Settings className="w-4 h-4" /> Subscription</Link>
+              <Link to="/pay-history" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm" data-testid="mobile-nav-pay-history"><DollarSign className="w-4 h-4" /> Pay History</Link>
               {["contractor","admin","superadmin"].includes(user.role) && (
                 <Link to="/archive" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-white text-sm" data-testid="mobile-nav-archive"><Archive className="w-4 h-4" /> Job Archive</Link>
               )}

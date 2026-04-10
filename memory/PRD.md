@@ -45,7 +45,11 @@ Import code from GitHub (https://github.com/buildbypurpose/PunchListJobsRemixV9.
 - Backend seeded with demo accounts (superadmin, admin, 5 crew, 3 contractors)
 - All services running via supervisor
 
-### Bug Fix: PostHog + reCAPTCHA Conflict (Android)
+### Session 7 (PayPal, Pay History, Captcha, Icon Cleanup) — April 2026
+- **PayPal** - Already fully implemented (SubscriptionPage.jsx + `/api/payments/paypal/pay`). Added `REACT_APP_PAYPAL_CLIENT_ID=sb` (sandbox) to frontend .env
+- **Pay History Page** - New `/pay-history` route with daily/weekly/monthly/yearly totals. Users see own transactions; Admins see all users. Backend: `GET /api/payments/history` + `GET /api/admin/payments/history`
+- **Captcha fix** - Added Google test reCAPTCHA keys to frontend/backend .env so the widget renders and passes verification
+- **Briefcase → ClipboardList** - Replaced in all 9 files: Navbar, AuthPage, LandingPage, ArchivePage, AdminDashboard, ContractorDashboard, CrewDashboard, ProfilePage, AppSettingsPage
 - **Root Cause**: PostHog session recording had `recordCrossOriginIframes: true` which caused it to monitor reCAPTCHA iframes. When reCAPTCHA resets after form submit, PostHog's `removeNodeFromMap` tries to access `childNodes` on a null iframe reference
 - **Fix 1**: Set `recordCrossOriginIframes: false` in PostHog config (index.html)
 - **Fix 2**: Added `blockSelector` for reCAPTCHA iframes in PostHog config

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import { toast } from "sonner";
-import { Archive, RotateCcw, Trash2, Eye, X, Briefcase, MapPin, DollarSign, Calendar } from "lucide-react";
+import { Archive, RotateCcw, Trash2, Eye, X, ClipboardList, MapPin, DollarSign, Calendar } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -123,7 +123,7 @@ export default function ArchivePage() {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {job.trade}</span>
+                    <span className="flex items-center gap-1"><ClipboardList className="w-3 h-3" /> {job.trade}</span>
                     {job.location?.city && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {job.location.city}</span>}
                     <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> ${job.pay_rate}/hr</span>
                     <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> Archived {fmtDate(job.archived_at)}</span>
